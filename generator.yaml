@@ -17,10 +17,18 @@ resources:
     fields:
       Content:
         is_document: true
+      Tags:
+        compare:
+          is_ignored: true
     exceptions:
       errors:
         404:
           code: InvalidDocument
+    hooks:
+      delta_pre_compare:
+        code: compareTags(delta, a, b)
+      sdk_update_pre_build_request:
+        template_path: hooks/document/sdk_update_pre_build_request.go.tpl
 
   Parameter:
     fields:

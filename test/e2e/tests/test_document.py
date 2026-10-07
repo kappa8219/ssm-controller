@@ -48,7 +48,7 @@ def document():
 
 @service_marker
 class TestDocument:
-    def test_create_delete(self, document):
+    def test_create_delete(self, document, ssm_client):
         (reference, _) = document
         time.sleep(CREATE_WAIT_AFTER_SECONDS)
 
@@ -59,6 +59,11 @@ class TestDocument:
         assert 'spec' in cr
         assert 'name' in cr["spec"]
         assert 'content' in cr["spec"]
+        tags = ssm_client.list_tags_for_resource(
+            ResourceType="Document",
+            ResourceId=cr["spec"]["name"],
+        )["TagList"]
+        assert {"Key": "ack-e2e-document-tag", "Value": "initial"} in tags
 
         # Update test
         update_data = {
@@ -85,3 +90,23 @@ class TestDocument:
         
         updated_cr = k8s.get_resource(reference)       
         assert updated_cr["spec"]["content"] == update_data["spec"]["content"]
+
+        tag_update_data = {
+            "spec": {
+                "tags": [
+                    {
+                        "key": "ack-e2e-document-tag",
+                        "value": "updated",
+                    },
+                ],
+            },
+        }
+        k8s.patch_custom_resource(reference, tag_update_data)
+        time.sleep(MODIFY_WAIT_AFTER_SECONDS)
+        assert k8s.wait_on_condition(reference, "ACK.ResourceSynced", "True", wait_periods=10)
+
+        tags = ssm_client.list_tags_for_resource(
+            ResourceType="Document",
+            ResourceId=updated_cr["spec"]["name"],
+        )["TagList"]
+        assert {"Key": "ack-e2e-document-tag", "Value": "updated"} in tags

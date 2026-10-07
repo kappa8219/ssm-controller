@@ -6,6 +6,9 @@ spec:
   name: $NAME
   documentType: Command
   documentFormat: JSON
+  tags:
+  - key: ack-e2e-document-tag
+    value: initial
   content: |
     {
       "schemaVersion": "2.2",
@@ -20,4 +23,3 @@ spec:
         }
       ]
     }
-
