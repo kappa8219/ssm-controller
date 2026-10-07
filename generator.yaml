@@ -41,6 +41,9 @@ resources:
     fields:
       Content:
         is_document: true
+      Tags:
+        compare:
+          is_ignored: true
     exceptions:
       errors:
         404:

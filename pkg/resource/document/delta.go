@@ -91,11 +91,6 @@ func newResourceDelta(
 			delta.Add("Spec.Requires", a.ko.Spec.Requires, b.ko.Spec.Requires)
 		}
 	}
-	desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)
-	latestACKTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags)
-	if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {
-		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
-	}
 	if ackcompare.HasNilDifference(a.ko.Spec.TargetType, b.ko.Spec.TargetType) {
 		delta.Add("Spec.TargetType", a.ko.Spec.TargetType, b.ko.Spec.TargetType)
 	} else if a.ko.Spec.TargetType != nil && b.ko.Spec.TargetType != nil {
